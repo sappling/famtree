@@ -1,5 +1,7 @@
 package org.appling.famtree.graph;
 
+import org.appling.famtree.gedcom.Person;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,28 @@ public class Generation {
               frame.setXPosition(frame.getXPosition() + amount);
             }
         }
+    }
+
+    /**
+     * Find the PersonFram for the specified person after the specified starting frame
+     * @param startFrame
+     * @param person
+     * @return
+     */
+    public PersonFrame findFollowingFrame(PersonFrame startFrame, Person person) {
+        boolean foundStart = false;
+        for (PersonFrame frame : frames) {
+            if (foundStart) {
+                if (frame.getPerson().equals(person)) {
+                    return frame;
+                }
+            } else {
+                if (startFrame.equals(frame)) {
+                    foundStart = true;
+                }
+            }
+        }
+        return null;
     }
 
     /*

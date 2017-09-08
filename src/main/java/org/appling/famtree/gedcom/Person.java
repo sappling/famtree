@@ -28,6 +28,14 @@ public class Person {
         return individual.getXref();
     }
 
+    public String getCleanId() {
+        String result = getId();
+        if (result.startsWith("@") && result.endsWith("@")) {
+            result = result.substring(1, result.length()-2);
+        }
+        return result;
+    }
+
     public PersonFrame getFrame() {
         return frame;
     }

@@ -36,6 +36,7 @@ public class PersonFrame {
     private Generation generation;
     private int spouseCount = 0;
     boolean hideChildren = false;
+    boolean showCrossRef = false;
 
 
     public PersonFrame(Person person) {
@@ -68,6 +69,10 @@ public class PersonFrame {
     @Nullable
     public Generation getGeneration() {
         return generation;
+    }
+
+    public void setShowCrossRef() {
+        showCrossRef = true;
     }
 
     public int getLeftSpace() {
@@ -150,11 +155,16 @@ public class PersonFrame {
             for (Family family : families) {
                 try {
                     Person spouse = family.getOtherSpouse(person);
-                    IntPoint topPoint;
+
+                    IntPoint topPoint = null;
                     if (spouse != null) {
-                        topPoint = spouse.getFrame().getWestPort(spouseCount);
-                        topPoint.moveBy(-1 * (MIN_HSPACE / 2), 0);
-                    } else {
+                        PersonFrame spouseFrame = getGeneration().findFollowingFrame(this, spouse);
+                        if (spouseFrame != null) {
+                            topPoint = spouseFrame.getWestPort(spouseCount);
+                            topPoint.moveBy(-1 * (MIN_HSPACE / 2), 0);
+                        }
+                    }
+                    if (topPoint == null) {
                         topPoint = getSouthPort();
                     }
                     java.util.List<Person> children = family.getChildren();
@@ -189,10 +199,13 @@ public class PersonFrame {
             try {
                 Person spouse = family.getOtherSpouse(person);
                 if (spouse != null) {
-                    IntPoint spousePort = spouse.getFrame().getWestPort(spouseCount);
-                    IntPoint myPort = getEastPort(spouseCount);
-                    g2d.drawLine(myPort.getX(), myPort.getY(), spousePort.getX(), spousePort.getY());
-                    spouseCount++;
+                    PersonFrame spouseFrame = getGeneration().findFollowingFrame(this, spouse);
+                    if (spouseFrame != null) {
+                        IntPoint spousePort = spouseFrame.getWestPort(spouseCount);
+                        IntPoint myPort = getEastPort(spouseCount);
+                        g2d.drawLine(myPort.getX(), myPort.getY(), spousePort.getX(), spousePort.getY());
+                        spouseCount++;
+                    }
                 }
             } catch (GedException e) {
                 e.printStackTrace();    // just print it out and continue.  No logging now
@@ -266,6 +279,12 @@ public class PersonFrame {
 
         g2d.drawString("D:"+death, xPos+1, y);
         y+= lineHeight;
+
+        if (showCrossRef) {
+            int x = xPos + 1;
+            y = yPos - 3;
+            g2d.drawString("See other "+getPerson().getCleanId(), x, y);
+        }
     }
 
     private IntPoint offsetToCenter(BufferedImage image, int widthOfSpace, int heightOfSpace) {

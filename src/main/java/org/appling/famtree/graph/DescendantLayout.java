@@ -187,6 +187,14 @@ public class DescendantLayout extends AbstractLayout {
         public void act(Person person, int spouseCount, int genNumber) {
             Generation generation = getGeneration(genNumber);
             PersonFrame frame = person.getFrame();
+            if (spouseCount > 0) {  // if this is not a descendant, but a spouse
+                if (frame.getGeneration() != null) { // if the spouse is already placed in a generation (can happen if married multiple times)
+                    frame.setShowCrossRef();
+                    frame = new PersonFrame(person);
+                    frame.setShowCrossRef();
+
+                }
+            }
             frame.setSpouseCount(spouseCount);
             if (frame.getGeneration() == null) { // only add frame if not already in another generation
                 int xPos = generation.getWidth();
