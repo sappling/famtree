@@ -1,16 +1,13 @@
 package org.appling.famtree.gedcom;
 
-import org.appling.famtree.descendantgraph.PersonFrame;
+import org.appling.famtree.graph.PersonFrame;
 import org.appling.famtree.util.DateUtils;
 import org.gedcom4j.model.*;
 import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by sappling on 8/12/2017.
@@ -115,6 +112,30 @@ public class Person {
         if (familiesWhereSpouse != null) {
             for (FamilySpouse familySpouse : familiesWhereSpouse) {
                 result.add(new Family(familySpouse.getFamily()));
+            }
+        }
+        return result;
+    }
+
+    public Person getFather() throws GedException {
+        Person result = null;
+        List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
+        if (!familiesWhereChild.isEmpty()) {
+            IndividualReference husband = familiesWhereChild.get(0).getFamily().getHusband();
+            if (husband != null) {
+                result = PersonRegistry.instance().getPerson(husband.getIndividual().getXref());
+            }
+        }
+        return result;
+    }
+
+    public Person getMother() throws GedException {
+        Person result = null;
+        List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
+        if (!familiesWhereChild.isEmpty()) {
+            IndividualReference wife = familiesWhereChild.get(0).getFamily().getWife();
+            if (wife != null) {
+                result = PersonRegistry.instance().getPerson(wife.getIndividual().getXref());
             }
         }
         return result;

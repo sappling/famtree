@@ -10,20 +10,27 @@ import java.util.List;
  */
 public class DescendantWalker {
     private PersonAction action;
+    private Person stopPerson;
+
     public DescendantWalker(PersonAction personAction) {
         action = personAction;
     }
 
-    public void walk(Person person, int generation) throws GedException {
-        walk(person, 0, false);
+    public void setStopPerson(Person stopPerson) {
+        this.stopPerson = stopPerson;
     }
 
-    private void walk(Person person, int generation, boolean moreChildren) throws GedException {
+    public void walk(Person person, int generation, int limit) throws GedException {
+        walk(person, 0, limit, false);
+    }
+
+    private void walk(Person person, int generation, int limit, boolean moreChildren) throws GedException {
         action.act(person, 0, generation);
 
         List<Family> families = person.getFamiliesWhereSpouse();
         int spouseCount = 1;
         Person lastSpouse = null;
+        boolean shouldStop = person.equals(stopPerson);
         for (Family family : families) {
             Person spouse = family.getOtherSpouse(person);
             if (spouse != null) {
@@ -31,14 +38,18 @@ public class DescendantWalker {
                 action.act(spouse, spouseCount++, generation);
             }
 
-            Iterator<Person> it = family.getChildren().iterator();
+            if (generation < limit) {
+                if ((stopPerson == null) || (!shouldStop)) {
+                    Iterator<Person> it = family.getChildren().iterator();
 
-            while (it.hasNext()) {
-                Person child = it.next();
-                walk(child, generation+1, it.hasNext());
+                    while (it.hasNext()) {
+                        Person child = it.next();
+                        walk(child, generation + 1, limit, it.hasNext());
+                    }
+                }
             }
         }
-        if (!moreChildren) {
+        if (!moreChildren || shouldStop) {
             if (lastSpouse != null) {
                 action.lastChildOrSpouse(lastSpouse);
             } else {

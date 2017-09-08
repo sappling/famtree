@@ -1,6 +1,6 @@
 package org.appling.famtree.gedcom;
 
-import org.appling.famtree.descendantgraph.PersonFrame;
+import org.appling.famtree.graph.PersonFrame;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
 import org.jetbrains.annotations.NotNull;

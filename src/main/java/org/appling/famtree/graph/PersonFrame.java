@@ -1,4 +1,4 @@
-package org.appling.famtree.descendantgraph;
+package org.appling.famtree.graph;
 
 import org.appling.famtree.gedcom.Family;
 import org.appling.famtree.gedcom.GedException;
@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by sappling on 8/12/2017.
@@ -21,13 +20,14 @@ import java.util.*;
 public class PersonFrame {
     public static final int VERT_PAGE_MARGIN = 20;
     public static final int HORIZ_PAGE_MARGIN = 20;
-    public static final int FRAME_HEIGHT = 200;
+    public static final int FRAME_HEIGHT = 170;
     public static final int FRAME_WIDTH = 82;
     public static final int MIN_HSPACE = 20;
     public static final int HSPACING = 40;
     public static final int VSPACING = 80;
     private static final int PICTURE_WIDTH = 80;
-    private static final int PICTURE_HEIGHT = 100;
+    private static final int PICTURE_HEIGHT = 80;
+    private static final int SPOUSE_LINE_OFFSET = 10;
     private Person person;
     private int xPos = 0;
     private int yPos = 0;
@@ -35,6 +35,7 @@ public class PersonFrame {
     private int rightSpace = MIN_HSPACE;
     private Generation generation;
     private int spouseCount = 0;
+    boolean hideChildren = false;
 
 
     public PersonFrame(Person person) {
@@ -57,6 +58,8 @@ public class PersonFrame {
     public Person getPerson() {
         return person;
     }
+
+    public void setHideChildren() { hideChildren = true; }
 
     public void setGeneration(Generation generation) {
         this.generation = generation;
@@ -84,11 +87,20 @@ public class PersonFrame {
     }
 
     public IntPoint getEastPort() {
-        return new IntPoint(xPos + FRAME_WIDTH, yPos + PICTURE_HEIGHT + 2);
+        return getEastPort(0);
+    }
+
+    public IntPoint getEastPort(int spouseCount) {
+        return new IntPoint(xPos + FRAME_WIDTH, (yPos + PICTURE_HEIGHT + 2) - (spouseCount * SPOUSE_LINE_OFFSET));
     }
 
     public IntPoint getWestPort() {
-        return new IntPoint(xPos, yPos + PICTURE_HEIGHT + 2);
+        return getWestPort(0);
+    }
+
+    public IntPoint getWestPort(int spouseCount) {
+
+        return new IntPoint(xPos, (yPos + PICTURE_HEIGHT + 2) - (spouseCount * SPOUSE_LINE_OFFSET));
     }
 
     public IntPoint getNorthPort() {
@@ -131,32 +143,38 @@ public class PersonFrame {
     }
 
     private void paintChildrenLines(Graphics2D g2d) {
-        java.util.List<Family> families = person.getFamiliesWhereSpouse();
-        for (Family family : families) {
-            try {
-                Person spouse = family.getOtherSpouse(person);
-                IntPoint topPoint;
-                if (spouse != null) {
-                    topPoint = spouse.getFrame().getWestPort();
-                    topPoint.moveBy(-1*(MIN_HSPACE/2), 0);
-                } else {
-                    topPoint = getSouthPort();
+        if (!hideChildren) {
+            java.util.List<Family> families = person.getFamiliesWhereSpouse();
+            int spouseCount = 0;
+
+            for (Family family : families) {
+                try {
+                    Person spouse = family.getOtherSpouse(person);
+                    IntPoint topPoint;
+                    if (spouse != null) {
+                        topPoint = spouse.getFrame().getWestPort(spouseCount);
+                        topPoint.moveBy(-1 * (MIN_HSPACE / 2), 0);
+                    } else {
+                        topPoint = getSouthPort();
+                    }
+                    java.util.List<Person> children = family.getChildren();
+                    for (Person child : children) {
+                        if (child.getFrame().getGeneration() != null) {
+                            IntPoint bottomPoint = child.getFrame().getNorthPort();
+                            IntPoint firstTurn = new IntPoint(topPoint.getX(), bottomPoint.getY() - (VSPACING / 3) - (spouseCount * SPOUSE_LINE_OFFSET));
+                            IntPoint secondTurn = new IntPoint(bottomPoint.getX(), firstTurn.getY());
+
+                            drawLine(g2d, topPoint, firstTurn);
+                            drawLine(g2d, firstTurn, secondTurn);
+                            drawLine(g2d, secondTurn, bottomPoint);
+                        }
+                    }
+                    spouseCount++;
+                } catch (GedException e) {
+                    e.printStackTrace();
                 }
-                java.util.List<Person> children = family.getChildren();
-                for (Person child : children) {
-                    IntPoint bottomPoint = child.getFrame().getNorthPort();
-                    IntPoint firstTurn = new IntPoint(topPoint.getX(), bottomPoint.getY() - (VSPACING/3));
-                    IntPoint secondTurn = new IntPoint(bottomPoint.getX(), firstTurn.getY());
-                    //g2d.drawLine(topPoint.getX(), topPoint.getY(), bottomPoint.getX(), bottomPoint.getY());
-                    drawLine(g2d, topPoint, firstTurn);
-                    drawLine(g2d, firstTurn, secondTurn);
-                    drawLine(g2d, secondTurn, bottomPoint);
-                }
-            } catch (GedException e) {
-                e.printStackTrace();
             }
         }
-
     }
 
     private void drawLine(Graphics2D g2d, IntPoint point1, IntPoint point2) {
@@ -165,13 +183,16 @@ public class PersonFrame {
 
     private void paintSpouseLines(Graphics2D g2d) {
         java.util.List<Family> families = person.getFamiliesWhereSpouse();
+
+        int spouseCount = 0;
         for (Family family : families) {
             try {
                 Person spouse = family.getOtherSpouse(person);
                 if (spouse != null) {
-                    IntPoint spousePort = spouse.getFrame().getWestPort();
-                    IntPoint myPort = getEastPort();
+                    IntPoint spousePort = spouse.getFrame().getWestPort(spouseCount);
+                    IntPoint myPort = getEastPort(spouseCount);
                     g2d.drawLine(myPort.getX(), myPort.getY(), spousePort.getX(), spousePort.getY());
+                    spouseCount++;
                 }
             } catch (GedException e) {
                 e.printStackTrace();    // just print it out and continue.  No logging now
@@ -183,16 +204,17 @@ public class PersonFrame {
         g2d.setPaint(Color.white);
         g2d.fill(new Rectangle(xPos, yPos, FRAME_WIDTH, FRAME_HEIGHT));
 
-        g2d.setPaint(Color.black);
-        g2d.draw(new Rectangle(xPos, yPos, FRAME_WIDTH, FRAME_HEIGHT));
-        g2d.draw(new Rectangle(xPos, yPos, FRAME_WIDTH, PICTURE_HEIGHT+2));
+        g2d.setPaint(Color.gray);
+        g2d.fill(new Rectangle(xPos, yPos+1, FRAME_WIDTH, PICTURE_HEIGHT+1));
         BufferedImage image = null;
         try {
             String imagePath = person.getProfileImagePath();
             //imagePath = "testtall.jpg";
-            if (imagePath != null) {
+            if (imagePath == null) {
+                g2d.setPaint(Color.white);
+                g2d.fill(new Rectangle(xPos, yPos+1, FRAME_WIDTH, PICTURE_HEIGHT+1));
+            } else {
                 image = ImageIO.read(new File(imagePath));
-                // src mode width height ops
                 BufferedImage scaledImage = scaleToFit(image, PICTURE_WIDTH, PICTURE_HEIGHT);
                 IntPoint offset = offsetToCenter(scaledImage, PICTURE_WIDTH, PICTURE_HEIGHT);
                 int imgY = yPos + offset.getY() + 1;
@@ -204,6 +226,9 @@ public class PersonFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        g2d.setPaint(Color.black);
+        g2d.draw(new Rectangle(xPos, yPos, FRAME_WIDTH, FRAME_HEIGHT));
+        g2d.draw(new Rectangle(xPos, yPos, FRAME_WIDTH, PICTURE_HEIGHT+2));
     }
 
     private BufferedImage scaleToFit(BufferedImage image, int width, int height) {
@@ -229,8 +254,10 @@ public class PersonFrame {
         }
 
 
-        String birth = DateUtils.normStringFromDate(person.getBirthDate());
-        String death = DateUtils.normStringFromDate(person.getDeathDate());
+        font = new Font("Lucida Sans", Font.PLAIN, 10);
+        g2d.setFont(font);
+        String birth = person.getBirthString(); //DateUtils.normStringFromDate(person.getBirthDate());
+        String death = person.getDeathString(); //DateUtils.normStringFromDate(person.getDeathDate());
 
         y = yPos + PICTURE_HEIGHT + (5*lineHeight);
 

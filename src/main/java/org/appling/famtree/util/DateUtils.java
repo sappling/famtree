@@ -11,6 +11,8 @@ import java.util.Date;
  */
 public class DateUtils {
     private static SimpleDateFormat gedFormat = new SimpleDateFormat("dd MMM yyyy");
+    private static SimpleDateFormat gedYearOnly = new SimpleDateFormat("yyyy");
+    private static SimpleDateFormat gedAbtYear = new SimpleDateFormat("'ABT' yyyy");
     private static SimpleDateFormat normFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     @Nullable
@@ -19,6 +21,12 @@ public class DateUtils {
         if (datesString != null) {
             try {
                 return gedFormat.parse(datesString);
+            } catch (ParseException e) {} // intentionally ignore and use default value
+            try {
+                return gedYearOnly.parse(datesString);
+            } catch (ParseException e) {} // intentionally ignore and use default value
+            try {
+                return gedAbtYear.parse(datesString);
             } catch (ParseException e) {} // intentionally ignore and use default value
         }
         return result;

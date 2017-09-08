@@ -22,6 +22,8 @@ public class DateUtilsTest {
         assertThat(DateUtils.dateFromGedDate("27 Aug 2017"), equalTo(new GregorianCalendar(2017, 7,27).getTime()));
         assertThat(DateUtils.dateFromGedDate("27 Aug 1717"), equalTo(new GregorianCalendar(1717, 7,27).getTime()));
         assertThat(DateUtils.dateFromGedDate(""), nullValue());
+        assertThat(DateUtils.dateFromGedDate("1891"), equalTo(new GregorianCalendar(1891, 0, 1).getTime()));
+        assertThat(DateUtils.dateFromGedDate("ABT 1891"), equalTo(new GregorianCalendar(1891, 0, 1).getTime()));
         assertNull(DateUtils.dateFromGedDate(null));
     }
 

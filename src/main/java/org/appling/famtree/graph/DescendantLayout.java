@@ -1,4 +1,4 @@
-package org.appling.famtree.descendantgraph;
+package org.appling.famtree.graph;
 
 import org.appling.famtree.gedcom.*;
 import org.jetbrains.annotations.Nullable;
@@ -10,14 +10,10 @@ import java.util.List;
 /**
  * Created by sappling on 8/26/2017.
  */
-public class DescandentLayout {
-    private static final PersonRegistry pr = PersonRegistry.instance();
-    ArrayList<Generation> generations = new ArrayList<>();
+public class DescendantLayout extends AbstractLayout {
+    private Person stopPerson;
 
-
-    public DescandentLayout() {
-    }
-
+    @Override
     public void layout(Person startPerson) throws GedException {
         populate(startPerson);
 
@@ -27,12 +23,21 @@ public class DescandentLayout {
             Generation parentGen = li.previous();
             centerParents(parentGen);
         }
+        /*
+        */
+    }
 
+    public void setStopPerson(Person stopPerson) {
+        this.stopPerson = stopPerson;
     }
 
     private void populate(Person startPerson) throws GedException {
         DescendantWalker walker = new DescendantWalker(new AddFrames());
-        walker.walk(startPerson, 0);
+        if (stopPerson != null) {
+            walker.setStopPerson(stopPerson);
+            stopPerson.getFrame().setHideChildren();
+        }
+        walker.walk(startPerson, 0, limit);
     }
 
     public void centerParents(Generation generation) throws GedException {
@@ -177,52 +182,10 @@ public class DescandentLayout {
     }
 
 
-
-    public int getWidth() {
-        return getWidestGeneration().getWidth();
-    }
-
-    public int getHeight() {
-        Generation lastGen = generations.get(generations.size() - 1);
-        return lastGen.getyPos() + PersonFrame.FRAME_HEIGHT + (2 * PersonFrame.VERT_PAGE_MARGIN);
-    }
-
-    public int getNumGenerations() {
-        return generations.size();
-    }
-
-    public int getTotalPeople() {
-        int result = 0;
-        for (Generation generation : generations) {
-            result += generation.getNumPeople();
-        }
-        return result;
-    }
-
-    public Generation getWidestGeneration() {
-        return Collections.max(generations, Comparator.comparing(Generation::getWidth));
-    }
-
-    public void render(Graphics2D gaphics) {
-        for (Generation generation : generations) {
-            for (PersonFrame frame : generation.getFrames()) {
-                frame.paint(gaphics);
-            }
-        }
-    }
-
-    public Generation getGaneration(int genNum) {
-        while (generations.size()-1 < genNum) {
-            Generation g = new Generation(genNum);
-            generations.add(g);
-        }
-        return generations.get(genNum);
-    }
-
     private class AddFrames implements PersonAction {
         @Override
         public void act(Person person, int spouseCount, int genNumber) {
-            Generation generation = getGaneration(genNumber);
+            Generation generation = getGeneration(genNumber);
             PersonFrame frame = person.getFrame();
             frame.setSpouseCount(spouseCount);
             if (frame.getGeneration() == null) { // only add frame if not already in another generation
@@ -241,7 +204,7 @@ public class DescandentLayout {
         public void lastChildOrSpouse(Person person) {
             PersonFrame frame = person.getFrame();
             int space = frame.getRightSpace();
-            frame.setRightSpace(space + (PersonFrame.FRAME_WIDTH/2)  + (2 * PersonFrame.MIN_HSPACE));
+            frame.setRightSpace(PersonFrame.FRAME_WIDTH/2);
         }
 
     }

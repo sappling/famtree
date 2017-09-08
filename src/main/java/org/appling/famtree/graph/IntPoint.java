@@ -1,4 +1,4 @@
-package org.appling.famtree.descendantgraph;
+package org.appling.famtree.graph;
 
 /**
  * Created by sappling on 8/29/2017.

@@ -1,4 +1,4 @@
-package org.appling.famtree.descendantgraph;
+package org.appling.famtree.graph;
 
 import org.appling.famtree.gedcom.Person;
 import org.junit.Test;
@@ -47,19 +47,19 @@ public class DescandentLayoutTest {
         PersonFrame descendant = li.next();
         assertThat(descendant.getLeftSpace(), equalTo(100));
 
-        PersonFrame spouse = DescandentLayout.getLastSpouse(li);
+        PersonFrame spouse = DescendantLayout.getLastSpouse(li);
         assertThat(spouse.getLeftSpace(), equalTo(101));
 
         descendant = li.next();
-        spouse = DescandentLayout.getLastSpouse(li);
+        spouse = DescendantLayout.getLastSpouse(li);
         assertThat(spouse.getLeftSpace(), equalTo(104));
 
         descendant = li.next();
-        spouse = DescandentLayout.getLastSpouse(li);
+        spouse = DescendantLayout.getLastSpouse(li);
         assertThat(spouse, nullValue());
 
         descendant = li.next();
-        spouse = DescandentLayout.getLastSpouse(li);
+        spouse = DescendantLayout.getLastSpouse(li);
         assertThat(spouse.getLeftSpace(), equalTo(107));
     }
 }

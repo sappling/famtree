@@ -1,6 +1,4 @@
-package org.appling.famtree.descendantgraph;
-
-import org.appling.famtree.gedcom.Person;
+package org.appling.famtree.graph;
 
 import java.util.ArrayList;
 import java.util.List;
