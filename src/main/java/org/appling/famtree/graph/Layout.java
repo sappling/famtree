@@ -15,6 +15,8 @@ public interface Layout {
 
     int getHeight();
 
+    void setLimit(int limit);
+
     int getNumGenerations();
 
     int getTotalPeople();
@@ -22,4 +24,6 @@ public interface Layout {
     void render(Graphics2D gaphics);
 
     Generation getGeneration(int genNum);
+
+    void setStopPerson(Person stopPerson);
 }

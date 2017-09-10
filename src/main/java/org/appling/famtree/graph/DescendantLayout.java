@@ -11,7 +11,6 @@ import java.util.List;
  * Created by sappling on 8/26/2017.
  */
 public class DescendantLayout extends AbstractLayout {
-    private Person stopPerson;
 
     @Override
     public void layout(Person startPerson) throws GedException {
@@ -25,10 +24,6 @@ public class DescendantLayout extends AbstractLayout {
         }
         /*
         */
-    }
-
-    public void setStopPerson(Person stopPerson) {
-        this.stopPerson = stopPerson;
     }
 
     private void populate(Person startPerson) throws GedException {

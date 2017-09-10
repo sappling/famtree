@@ -128,7 +128,7 @@ public class Person {
     public Person getFather() throws GedException {
         Person result = null;
         List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
-        if (!familiesWhereChild.isEmpty()) {
+        if (familiesWhereChild != null && !familiesWhereChild.isEmpty()) {
             IndividualReference husband = familiesWhereChild.get(0).getFamily().getHusband();
             if (husband != null) {
                 result = PersonRegistry.instance().getPerson(husband.getIndividual().getXref());

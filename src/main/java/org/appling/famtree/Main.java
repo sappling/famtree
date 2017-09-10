@@ -15,6 +15,8 @@ import org.appling.famtree.graph.DescendantLayout;
 import org.appling.famtree.gedcom.GedException;
 import org.appling.famtree.gedcom.Person;
 import org.appling.famtree.gedcom.PersonRegistry;
+import org.appling.famtree.graph.Layout;
+import org.appling.famtree.graph.PaternalAncestorLayout;
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.parser.GedcomParser;
@@ -33,8 +35,9 @@ public class Main {
     private static final String OPTION_IN = "in";
     private static final String OPTION_GEN = "gen";
     private static final String OPTION_STOP = "stop";
-    private static final String OPTION_HELP = "help";
     private static final String OPTION_TYPE = "type";
+    private static final String OPTION_LAYOUT = "layout";
+    private static final String OPTION_HELP = "help";
 
     public static void main (String args[]) {
         CommandLineParser parser = new DefaultParser();
@@ -57,10 +60,21 @@ public class Main {
             System.exit(0);
         }
 
-        DescendantLayout layout = null;
+        Layout layout = null;
         String rootName = "";
         try {
-            layout = new DescendantLayout();
+            boolean descLayout = true;
+            if (line.hasOption(OPTION_LAYOUT)) {
+                if (line.getOptionValue(OPTION_LAYOUT).equalsIgnoreCase("paternalline")) {
+                    descLayout = false;
+                }
+            }
+
+            if (descLayout) {
+                layout = new DescendantLayout();
+            } else {
+                layout = new PaternalAncestorLayout();
+            }
             //layout.showGrid();
 
             Person rootPerson = getPerson(line.getOptionValue(OPTION_IN), line.getOptionValue(OPTION_ID));
@@ -121,7 +135,7 @@ public class Main {
         */
     }
 
-    private static void writePdf(DescendantLayout layout, String outPath) {
+    private static void writePdf(Layout layout, String outPath) {
         int width = layout.getWidth();
         int height = layout.getHeight();
         Document document = new Document(new Rectangle(width, height));
@@ -145,7 +159,7 @@ public class Main {
         document.close();
     }
 
-    private static void writeSvg(DescendantLayout layout, String outPath) {
+    private static void writeSvg(Layout layout, String outPath) {
         // Get a DOMImplementation.
         DOMImplementation domImpl =
                 GenericDOMImplementation.getDOMImplementation();
@@ -218,6 +232,11 @@ public class Main {
                 .argName("ID").build());
         options.addOption(Option.builder(OPTION_TYPE)
                 .desc("Type of output: svg or pdf")
+                .optionalArg(false)
+                .numberOfArgs(1)
+                .argName("type").build());
+        options.addOption(Option.builder(OPTION_LAYOUT)
+                .desc("Type of layout: descendant (default) or paternalline")
                 .optionalArg(false)
                 .numberOfArgs(1)
                 .argName("type").build());

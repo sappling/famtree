@@ -1,5 +1,6 @@
 package org.appling.famtree.graph;
 
+import org.appling.famtree.gedcom.Person;
 import org.appling.famtree.gedcom.PersonRegistry;
 
 import java.awt.*;
@@ -14,8 +15,10 @@ public abstract class AbstractLayout implements Layout {
     protected static final PersonRegistry pr = PersonRegistry.instance();
     protected ArrayList<Generation> generations = new ArrayList<>();
     protected int limit = Integer.MAX_VALUE;
+    protected Person stopPerson;
     private boolean showGrid = false;
 
+    @Override
     public void setLimit(int limit) {
         this.limit = limit;
     }
@@ -57,6 +60,11 @@ public abstract class AbstractLayout implements Layout {
     public int getHeight() {
         Generation lastGen = generations.get(generations.size() - 1);
         return lastGen.getyPos() + PersonFrame.FRAME_HEIGHT + (2 * PersonFrame.VERT_PAGE_MARGIN);
+    }
+
+    @Override
+    public void setStopPerson(Person stopPerson) {
+        this.stopPerson = stopPerson;
     }
 
     public Generation getWidestGeneration() {

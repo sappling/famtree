@@ -15,12 +15,16 @@ public class Generation {
 
     public Generation(int genNum) {
         this.genNum = genNum;
-        yPos = ((PersonFrame.VSPACING + PersonFrame.FRAME_HEIGHT)* genNum)+PersonFrame.VERT_PAGE_MARGIN;
+        setYPosForGen(genNum);
     }
 
     public void addFrame(PersonFrame frame) {
         frame.setGeneration(this);
         frames.add(frame);
+    }
+
+    public void setYPosForGen(int genNum) {
+        yPos = ((PersonFrame.VSPACING + PersonFrame.FRAME_HEIGHT)* genNum)+PersonFrame.VERT_PAGE_MARGIN;
     }
 
     public int getWidth() {
