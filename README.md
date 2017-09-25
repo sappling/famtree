@@ -19,7 +19,7 @@ form.
 
 Download
 --------
-A zip of the latest released version is [here](https://github.com/sappling/rallyx/releases).
+A zip of the latest released version is [here](https://github.com/sappling/famtree/releases).
 
 How To Build
 ------------
@@ -42,12 +42,15 @@ Use the script bin/famtree.bat or bin/famtree to run the tool.
 #### Command Line Arguments
 
 ```
-famtree [-gen <numgen>] [-help] -id <ID> -in <filename> [-layout <type>] [-out <filename>] [-stop <ID>] [-type <type>]
+usage: famtree [-gen <numgen>] [-help] [-id <ID>] [-in <filename>]
+       [-layout <type>] [-names] [-out <filename>] [-stop <ID>] [-type
+       <type>]
  -gen <numgen>     maximum number of generations
  -help             Show commmand line usage
  -id <ID>          ID number of top ancestor
- -in <filename>    specifies input file
+ -in <filename>    specifies gedcom input file
  -layout <type>    Type of layout: descendant (default) or paternalline
+ -names            List names and IDs in input GEDCOM file
  -out <filename>   specifies input file
  -stop <ID>        Person to stop at
  -type <type>      Type of output: svg or pdf
