@@ -30,32 +30,54 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by sappling on 8/12/2017.
  */
 public class Person {
+    private static Pattern namePattern = Pattern.compile("(.+)\\s+/(.+)/\\s*(\\S+)*");
 
     private final Individual individual;
     private PersonFrame frame = null;
     private String fullName = "";
+    private String surname = "";
+    private String suffix = "";
+    private String startingNames = "";
 
     public Person(Individual individual) {
         this.individual = individual;
-        parseName();
+        parseAllNames();
     }
 
     @NotNull
-    public String getId() {
+    public String getGedcomId() {
         return individual.getXref();
     }
 
     public String getCleanId() {
-        String result = getId();
+        return getCleanId(getGedcomId());
+    }
+
+    public static String getCleanId(String gedcomId) {
+        String result = gedcomId;
         if (result.startsWith("@") && result.endsWith("@")) {
-            result = result.substring(1, result.length()-2);
+            result = result.substring(1, result.length()-1);
         }
         return result;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public String getStartingNames() {
+        return startingNames;
     }
 
     public PersonFrame getFrame() {
@@ -66,36 +88,28 @@ public class Person {
         this.frame = frame;
     }
 
-    private void parseName() {
+    private void parseAllNames() {
         List<PersonalName> names = individual.getNames();
         if (names.size() > 0) {
             PersonalName name = names.get(0);
-            String basicName = name.getBasic();
-            fullName = basicName.replaceAll("/","");
-
-            // This name is in the form "first middle /last/"
-
-            //todo - need to use regex instead.  Live with for now while exploring graphic part
-            //Pattern p = Pattern.compile("(\\S+)\s()");
-
-            /*
-            String[] splits = basicName.split(" ");
-            if (splits.length > 0) {
-                firstName = splits[0];
-            } if (splits.length > 1) {
-                lastName = splits[splits.length-1];
-            } if (splits.length > 2) {
-                String[] middle = Arrays.copyOfRange(splits, 1, splits.length - 2);
-                for (int i=0; i<middle.length; i++) {
-                    middleNames += middle[i];
-                    if (i<middle.length) {
-                        middleNames += " ";
-                    }
-                }
-            }
-            */
+            parseName(name.getBasic());
         }
 
+    }
+
+    protected void parseName(String name) {
+        // This name is in the form "title first middle /last/ suffix"
+        Matcher matcher = namePattern.matcher(name);
+        if (matcher.matches()) {
+            startingNames = matcher.group(1);
+            surname = matcher.group(2);
+            String group3 = matcher.group(3);
+            if (group3 != null) {
+                suffix = group3;
+            }
+        }
+
+        fullName = name.replaceAll("/","");
     }
 
     public String getFullName() {
@@ -153,7 +167,7 @@ public class Person {
         if (familiesWhereChild != null && !familiesWhereChild.isEmpty()) {
             IndividualReference husband = familiesWhereChild.get(0).getFamily().getHusband();
             if (husband != null) {
-                result = PersonRegistry.instance().getPerson(husband.getIndividual().getXref());
+                result = PersonRegistry.instance().getPerson(Person.getCleanId(husband.getIndividual().getXref()));
             }
         }
         return result;
@@ -165,7 +179,7 @@ public class Person {
         if (!familiesWhereChild.isEmpty()) {
             IndividualReference wife = familiesWhereChild.get(0).getFamily().getWife();
             if (wife != null) {
-                result = PersonRegistry.instance().getPerson(wife.getIndividual().getXref());
+                result = PersonRegistry.instance().getPerson(Person.getCleanId(wife.getIndividual().getXref()));
             }
         }
         return result;
@@ -178,7 +192,7 @@ public class Person {
 
         Person person = (Person) o;
 
-        return getId().equals(person.getId());
+        return getCleanId().equals(person.getCleanId());
     }
 
     @Nullable
@@ -249,10 +263,10 @@ public class Person {
 
     @Override
     public int hashCode() {
-        return individual.getXref().hashCode();
+        return getCleanId().hashCode();
     }
 
     public String toString() {
-        return getFullName() + " : "+ getId();
+        return getFullName() + " : "+ getCleanId();
     }
 }

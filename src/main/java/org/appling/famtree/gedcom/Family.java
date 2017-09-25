@@ -60,7 +60,7 @@ public class Family {
         Person result = null;
         IndividualReference husband = gfamily.getHusband();
         if (husband != null) {
-            result = PersonRegistry.instance().getPerson(husband.getIndividual().getXref());
+            result = PersonRegistry.instance().getPerson(Person.getCleanId(husband.getIndividual().getXref()));
         }
         return result;
     }
@@ -69,7 +69,7 @@ public class Family {
         Person result = null;
         IndividualReference wife = gfamily.getWife();
         if (wife != null) {
-            result = PersonRegistry.instance().getPerson(wife.getIndividual().getXref());
+            result = PersonRegistry.instance().getPerson(Person.getCleanId(wife.getIndividual().getXref()));
         }
         return result;
     }
@@ -80,7 +80,7 @@ public class Family {
 
         if (gChildren != null) {
             for (IndividualReference gChild : gChildren) {
-                String id = gChild.getIndividual().getXref();
+                String id = Person.getCleanId(gChild.getIndividual().getXref());
                 PersonRegistry pr = PersonRegistry.instance();
                 results.add(pr.getPerson(id));
             }

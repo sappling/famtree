@@ -39,6 +39,7 @@ import org.appling.famtree.gedcom.Person;
 import org.appling.famtree.gedcom.PersonRegistry;
 import org.appling.famtree.graph.Layout;
 import org.appling.famtree.graph.PaternalAncestorLayout;
+import org.appling.famtree.util.PersonNameComparator;
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.parser.GedcomParser;
@@ -47,6 +48,7 @@ import org.w3c.dom.DOMImplementation;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by sappling on 8/29/2017.
@@ -55,6 +57,7 @@ public class Main {
     private static final String OPTION_ID = "id";
     private static final String OPTION_OUT = "out";
     private static final String OPTION_IN = "in";
+    private static final String OPTION_NAMES = "names";
     private static final String OPTION_GEN = "gen";
     private static final String OPTION_STOP = "stop";
     private static final String OPTION_TYPE = "type";
@@ -85,6 +88,24 @@ public class Main {
         Layout layout = null;
         String rootName = "";
         try {
+            if (!line.hasOption(OPTION_IN)) {
+                System.err.println("Missing -in option.  You must specify the GEDCOM file used for input.");
+                printHelp(options);
+                System.exit(-1);
+            }
+            PersonRegistry pr = loadPersonRegistry(line.getOptionValue(OPTION_IN));
+
+            if (line.hasOption(OPTION_NAMES)) {
+                List<Person> people = new ArrayList<Person>();
+                people.addAll(pr.getAllPeople());
+                Collections.sort(people, new PersonNameComparator());
+                for (Person person : people) {
+                    System.out.println(person);
+                }
+                System.exit(0);
+            }
+
+
             boolean descLayout = true;
             if (line.hasOption(OPTION_LAYOUT)) {
                 if (line.getOptionValue(OPTION_LAYOUT).equalsIgnoreCase("paternalline")) {
@@ -99,14 +120,19 @@ public class Main {
             }
             //layout.showGrid();
 
-            Person rootPerson = getPerson(line.getOptionValue(OPTION_IN), line.getOptionValue(OPTION_ID));
+            if (!line.hasOption(OPTION_ID)) {
+                System.err.println("Missing -id option.  Specify the id of the person at the root of the tree.");
+                printHelp(options);
+                System.exit(-1);
+            }
+            Person rootPerson = getPerson(pr, line.getOptionValue(OPTION_ID));
             rootName = rootPerson.getFullName();
 
             if (line.hasOption(OPTION_GEN)) {
                 layout.setLimit(Integer.parseInt(line.getOptionValue(OPTION_GEN)));
             }
             if (line.hasOption(OPTION_STOP)) {
-                Person stopPerson = PersonRegistry.instance().getPerson(String.format("@I%s@", line.getOptionValue(OPTION_STOP)));
+                Person stopPerson = PersonRegistry.instance().getPerson(line.getOptionValue(OPTION_STOP));
                 layout.setStopPerson(stopPerson);
             }
             layout.layout(rootPerson);
@@ -206,15 +232,18 @@ public class Main {
 
     }
 
-    private static Person getPerson(String filePath, String personId) throws GedException, IOException, GedcomParserException {
+    private static PersonRegistry loadPersonRegistry(String filePath) throws IOException, GedcomParserException {
         GedcomParser gp = new GedcomParser();
         File gedFile = new File(filePath);
         gp.load(gedFile.getAbsolutePath());
         Gedcom g = gp.getGedcom();
         PersonRegistry pr = PersonRegistry.instance();
         pr.setGedcom(g);
+        return pr;
+    }
 
-        return pr.getPerson(String.format("@I%s@", personId));
+    private static Person getPerson(PersonRegistry pr, String personId) throws GedException {
+        return pr.getPerson(personId);
     }
 
     private static void printHelp(Options options) {
@@ -226,8 +255,7 @@ public class Main {
     private static Options setupOptions() {
         Options options = new Options();
         options.addOption(Option.builder(OPTION_IN)
-                .desc("specifies input file")
-                .required()
+                .desc("specifies gedcom input file")
                 .optionalArg(false)
                 .numberOfArgs(1)
                 .argName("filename").build());
@@ -238,7 +266,6 @@ public class Main {
                 .argName("filename").build());
         options.addOption(Option.builder(OPTION_ID)
                 .desc("ID number of top ancestor")
-                .required()
                 .optionalArg(false)
                 .numberOfArgs(1)
                 .argName("ID").build());
@@ -262,6 +289,9 @@ public class Main {
                 .optionalArg(false)
                 .numberOfArgs(1)
                 .argName("type").build());
+        options.addOption(Option.builder(OPTION_NAMES)
+                .desc("List names and IDs in input GEDCOM file")
+                .build());
         options.addOption(Option.builder(OPTION_HELP)
                 .desc("Show commmand line usage")
                 .build());

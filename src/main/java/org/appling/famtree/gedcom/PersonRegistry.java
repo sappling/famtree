@@ -50,8 +50,8 @@ public class PersonRegistry {
             Person person = new Person(entry.getValue());
             PersonFrame frame = new PersonFrame(person);
             person.setFrame(frame);
-            personMap.put(entry.getKey(), person);
-            frameMap.put(entry.getKey(), frame);
+            personMap.put(person.getCleanId(), person);
+            frameMap.put(person.getCleanId(), frame);
         }
     }
 
