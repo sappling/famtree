@@ -61,9 +61,9 @@ People are identified in your gedcom file with an ID such as:
 0 @I201@ INDI
 1 NAME Lisa Franklin /Doty/
 ```
-When using the "id" or "stop" arguments that take an ID parameter, just
-use the numeric portion of the ID.  For example,
-`famtree -in famdata.ged -id 201` would
+When using the "id" or "stop" arguments that take an ID parameter, it is the id between the @ signs on the
+INDI line.  For example,
+`famtree -in famdata.ged -id I201` would
 print out a descendant chart for Lisa Doty.
 
 When creating a chart, I found that in some cases, the resulting chart

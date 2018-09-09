@@ -260,7 +260,7 @@ public class Main {
                 .numberOfArgs(1)
                 .argName("filename").build());
         options.addOption(Option.builder(OPTION_OUT)
-                .desc("specifies input file")
+                .desc("specifies output file")
                 .optionalArg(false)
                 .numberOfArgs(1)
                 .argName("filename").build());
