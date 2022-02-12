@@ -24,24 +24,24 @@ A zip of the latest released version is [here](https://github.com/sappling/famtr
 How To Build
 ------------
 This project include a [gradle](http://gradle.org) build file and wrapper.
-Use the provided gradlew file to create a project for your IDE or a
+Use the provided *gradlew* file to create a project for your IDE or a
 command line runner.  You will need to have a Java 8 JRE or JDK installed and your
-JAVA_HOME environment variable set with a path to your JRE.
+`JAVA_HOME` environment variable set with a path to your JRE.
 
-Run "gradlew idea" to generate a project for [IntelliJ Idea](https://www.jetbrains.com/idea/).
-Run "gradlew eclipse" to generate a project for [Eclipse](https://eclipse.org/ide/).
+Run `gradlew idea` to generate a project for [IntelliJ Idea](https://www.jetbrains.com/idea/).
+Run `gradlew eclipse` to generate a project for [Eclipse](https://eclipse.org/ide/).
 
-Run "gradlew dist" to build a runnable sample in the build/install/rallyx
-directory and a zip in build/distributions.
+Run `gradlew dist` to build a runnable sample in the *build/install/famtree*
+directory and a zip in *build/distributions*.
 
 Running
 -------
-Use the script bin/famtree.bat or bin/famtree to run the tool.
+Use the script *bin/famtree.bat* or *bin/famtree* to run the tool.
 
 
 #### Command Line Arguments
 
-```
+``` bash
 usage: famtree [-gen <numgen>] [-help] [-id <ID>] [-in <filename>]
        [-layout <type>] [-names] [-out <filename>] [-stop <ID>] [-type
        <type>]
@@ -61,8 +61,8 @@ People are identified in your gedcom file with an ID such as:
 0 @I201@ INDI
 1 NAME Lisa Franklin /Doty/
 ```
-When using the "id" or "stop" arguments that take an ID parameter, it is the id between the @ signs on the
-INDI line.  For example,
+When using the `id` or `stop` arguments that take an ID parameter, it is the id between the `@` signs on the
+`INDI` line.  For example,
 `famtree -in famdata.ged -id I201` would
 print out a descendant chart for Lisa Doty.
 

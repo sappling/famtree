@@ -11,7 +11,7 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = 'org.appling.rallyx.Main'
+mainClassName = 'org.appling.famtree.Main'
 
 version = '0.8'
 
