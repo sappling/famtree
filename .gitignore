@@ -1,0 +1,14 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Personal information
+*.ged
+*.pdf
+*.svg
