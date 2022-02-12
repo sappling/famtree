@@ -31,7 +31,7 @@ JAVA_HOME environment variable set with a path to your JRE.
 Run "gradlew idea" to generate a project for [IntelliJ Idea](https://www.jetbrains.com/idea/).
 Run "gradlew eclipse" to generate a project for [Eclipse](https://eclipse.org/ide/).
 
-Run "gradlew dist" to build a runnable sample in the build/install/rallyx
+Run "gradlew dist" to build a runnable sample in the build/install/famtree
 directory and a zip in build/distributions.
 
 Running
