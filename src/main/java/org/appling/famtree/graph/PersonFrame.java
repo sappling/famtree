@@ -84,6 +84,8 @@ public class PersonFrame {
 
     public void setHideChildren() { hideChildren = true; }
 
+    public boolean isHideChildren() { return hideChildren; }
+
     public void setGeneration(Generation generation) {
         this.generation = generation;
     }

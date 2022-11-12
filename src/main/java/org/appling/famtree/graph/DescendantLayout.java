@@ -63,6 +63,10 @@ public class DescendantLayout extends AbstractLayout {
 
         while (it.hasNext()) {
             PersonFrame descendant = it.next();
+
+            if (shouldStop(descendant)) {
+                continue;
+            }
             PersonFrame spouse = getLastSpouse(it);
             int left = descendant.getXPosition();
             int right = left + PersonFrame.FRAME_WIDTH;
@@ -105,6 +109,21 @@ public class DescendantLayout extends AbstractLayout {
                 }
             }
         }
+    }
+
+    boolean shouldStop(PersonFrame personFrame) throws GedException {
+        Person person = personFrame.getPerson();
+        boolean result = person.equals(stopPerson);
+        if (!result) {
+            List<Family> families = person.getFamiliesWhereSpouse();
+            for (Family family : families) {
+                if (stopPerson.equals(family.getOtherSpouse(person))) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     static PersonFrame getLastSpouse(ListIterator<PersonFrame> it) {
